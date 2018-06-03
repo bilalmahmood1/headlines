@@ -16,26 +16,15 @@ RSS_FEEDS = {'bbc':'http://feeds.bbci.co.uk/news/rss.xml',
              'fox':'http://feeds.foxnews.com/foxnews/latest',
              'iol':'http://www.iol.co.za/cmlink/1.640'}
 
+
 @app.route("/")
-@app.route("/bbc")
-def bbc_news():
-    return get_news('bbc')
-
-@app.route("/cnn")
-def cnn_news():
-    return get_news('cnn')
-
-@app.route("/fox")
-def fox_news():
-    return get_news('fox')
-
-@app.route("/iol")
-def iol_news():
-    return get_news('iol')
+@app.route("/<channel>")
+def route(channel = 'bbc'):
+    return get_news(channel)
 
 
 def get_news(channel):
-    rss_feed = feedparser.parse(RSS_FEEDS[channel])
+    rss_feed = feedparser.parse(RSS_FEEDS.get(channel))
   
     entry_html_block = """
          <b>{0}</b><br/> 
