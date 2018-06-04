@@ -5,6 +5,7 @@ Headlines Project
 """
 
 from flask import Flask
+from flask import render_template
 import feedparser
 
 
@@ -15,12 +16,10 @@ RSS_FEEDS = {'bbc':'http://feeds.bbci.co.uk/news/rss.xml',
              'fox':'http://feeds.foxnews.com/foxnews/latest',
              'iol':'http://www.iol.co.za/cmlink/1.640'}
 
-
 @app.route("/")
 @app.route("/<channel>")
 def route(channel = 'bbc'):
     return get_news(channel)
-
 
 def get_news(channel):
     rss_feed = feedparser.parse(RSS_FEEDS.get(channel))
@@ -39,9 +38,9 @@ def get_news(channel):
         """
         content = ""  
         for entry in rss_feed['entries']:
-            content += entry_html_block.format(entry.get('title').encode('utf-8'),
-                                entry.get('published').encode('utf-8'),
-                                entry.get('summary').encode('utf-8'))
+            content += entry_html_block.format(entry.get('title'),
+                                entry.get('published'),
+                                entry.get('summary'))
         
         html_page = """<html>
                          <body>
@@ -52,8 +51,7 @@ def get_news(channel):
                       
         return html_page.format(channel.upper(), content)
         
-
 if __name__ == "__main__":
     app.run(host = '0.0.0.0',
-            port = 80, debug = True)
+            port = 5000, debug = True)
     
