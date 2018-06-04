@@ -5,6 +5,10 @@
 </head>
 <body>
 	<h1>Headlines from {{channel}}</h1>
+	<form method="GET">
+		<input type="text" name="channel" placeholder="News Channel" />
+		<input type="submit" value="Get Feed"/>
+	</form>
 	{% for article in articles %}
 		<b><a href="{{article.link}}">{{article.title}}</a></b><br>
 		<i>{{article.published}}</i><br>
