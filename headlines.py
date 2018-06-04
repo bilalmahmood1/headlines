@@ -39,9 +39,9 @@ def get_news(channel):
         """
         content = ""  
         for entry in rss_feed['entries']:
-            content += entry_html_block.format(entry.get('title'),
-                                entry.get('published'),
-                                entry.get('summary'))
+            content += entry_html_block.format(entry.get('title').encode('utf-8'),
+                                entry.get('published').encode('utf-8'),
+                                entry.get('summary').encode('utf-8'))
         
         html_page = """<html>
                          <body>
@@ -54,6 +54,6 @@ def get_news(channel):
         
 
 if __name__ == "__main__":
-    app.run(host = 'localhost',
-            port = 5000, debug = True)
+    app.run(host = '0.0.0.0',
+            port = 80, debug = True)
     
