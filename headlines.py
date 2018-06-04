@@ -23,33 +23,16 @@ def route(channel = 'bbc'):
 
 def get_news(channel):
     rss_feed = feedparser.parse(RSS_FEEDS.get(channel))
-    ## A really simple way to handle internet breakdown or wrong URLS
-    if len(rss_feed.entries) == 0 or rss_feed.status != 200:
-        return """<html>
-                     <body>
-                     <h1>Can't Access Feeds Right Now!</h1>
-                    </body>
-                  </html>"""
-    else:              
-        entry_html_block = """
-             <b>{0}</b><br/> 
-             <i>{1}</i><br/>
-             <p>{2}</p><br/>        
-        """
-        content = ""  
-        for entry in rss_feed['entries']:
-            content += entry_html_block.format(entry.get('title'),
-                                entry.get('published'),
-                                entry.get('summary'))
-        
-        html_page = """<html>
-                         <body>
-                         <h1>{0} Headlines </h1>
-                         {1}
-                        </body>
-                      </html>"""
-                      
-        return html_page.format(channel.upper(), content)
+    if rss_feed['bozo'] == 1:
+        return render_template("error.html",
+                               channel = channel.upper(),
+                               channels = RSS_FEEDS.keys())
+    else:    
+        feeds = rss_feed['entries']
+        return render_template("home.html",
+                               channel = channel.upper(),
+                               articles = feeds)
+            
         
 if __name__ == "__main__":
     app.run(host = '0.0.0.0',
