@@ -63,7 +63,11 @@
 
 	<h3>Latest news from {{channel}}</h3>
 	<form method="GET">
-		<input type="text" name="channel" placeholder="Channel" />
+		<select name="news">
+		{% for c in channel_list %}
+			<option value="{{c}}" {{'selected="selected"' if channel==c }}> {{c}} </option>
+		{% endfor %}
+		</select>
 		<input type="submit" value="Sumbit"/>
 	</form>
 	{% for article in articles %}

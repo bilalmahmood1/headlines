@@ -13,14 +13,12 @@ import pandas as pd
 from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource, LabelSet, HoverTool 
 from bokeh.embed import components
-
+import datetime
+from flask import make_response
 
 API_KEY_OM = "7f9456d63fadcd1e8d9ef6372412f7a9"
-#API_KEY_OM = "cb932829eacb6a0e9ee4f38bfbf112ed"
 API_KEY_OPENEX = "9ebd0db7b139498ab4f653c4f7ddc8a7"
 
-
-app = Flask(__name__)
 
 RSS_FEEDS = {'bbc':'http://feeds.bbci.co.uk/news/rss.xml',
              'cnn':'http://rss.cnn.com/rss/edition.rss',
@@ -33,46 +31,67 @@ DEFAULTS = {'news': 'bbc',
             'currency_to':'pkr'}
 
 
+app = Flask(__name__)
+
+
+
 @app.route("/")
 def home():
+    ## Get city name and make weather related API calls
+    city = get_feature_value("city")
     
-    city = request.args.get("city")   
-    if not city:
-        city = DEFAULTS['city']    
     weather = get_weather(city)
     forcast = get_weather_forcast(city)
     plot = create_forcast_plot(forcast)
     
-    currency_from = request.args.get("currency_from")
-    if not currency_from:
-        currency_from = DEFAULTS['currency_from'] 
-        
-    currency_to = request.args.get("currency_to")
-    if not currency_to:
-        currency_to =  DEFAULTS['currency_to']
-        
+    ## Get currency name for rate information, once again using API calls
+    currency_from = get_feature_value("currency_from")
+    currency_to = get_feature_value("currency_to")
+   
     current_rate, currency_list = get_rate(currency_from,currency_to)
     current_rate = round(current_rate, 3)
      
-    channel = request.args.get("channel")
-    if not channel or channel.lower() not in RSS_FEEDS:
-        
-        channel = DEFAULTS['news']
+    ## Get channel feeds using API calls
+    channel = get_feature_value("news")
+    
     feeds = get_news(channel.lower())
     
     script, div = components(plot)
     
-    return render_template("home.html",
-                           channel = channel.upper(),
-                           articles = feeds,
-                           currency_from = currency_from.upper(),
-                           currency_to = currency_to.upper(),
-                           current_rate = current_rate,
-                           currency_list = sorted(currency_list),
-                           weather = weather,
-                           script=script,
-                           div=div)
+    response = make_response(render_template("home.html",
+                             channel = channel.upper(),
+                             channel_list = [i.upper() for i in RSS_FEEDS.keys()],
+                             articles = feeds,
+                             currency_from = currency_from.upper(),
+                             currency_to = currency_to.upper(),
+                             current_rate = current_rate,
+                             currency_list = sorted(currency_list),
+                             weather = weather,
+                             script=script,
+                             div=div))
 
+
+    expire_date = datetime.datetime.now() + datetime.timedelta(days = 365)
+    
+    response.set_cookie("city", city, expires = expire_date)
+    response.set_cookie("news", channel, expires=expire_date)
+    response.set_cookie("currency_from", currency_from, expires=expire_date)
+    response.set_cookie("currency_to", currency_to, expires=expire_date)
+    
+    return response
+
+def get_feature_value(key):
+    value = request.args.get(key)
+    if value:
+        return value
+    else:
+        cookie_value = request.cookies.get(key)
+        if cookie_value:
+            return cookie_value
+        else:
+            return DEFAULTS[key]
+            
+        
 def get_news(channel):
     """Retrive Feeds from the chosen list of news channels"""
     
