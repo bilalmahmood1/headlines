@@ -10,25 +10,64 @@
 	    rel="stylesheet" type="text/css">
 
 	<script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.13.min.js"></script>
+	<script type="text/javascript"></script>
 	<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.13.min.js"></script>
 
 	<style>
-		.bk-root{
+		html{
+				font-family: "Helvetica";
+				background: white;
+			}
+		body {
+			
+			max-width: 1200px;
+			margin: 0 auto;
+			}
+		#header {
+
+ 			margin: auto;
+    		text-align: center; 
+		    width: 100%
+
+		}
+		.bk-root {
 		    height: 40%;
 		    width: 100%;
-		    float:right;
+		    margin: 0 auto;
+		    
+		}
+		input[type="text"], select {
+			color: black;
+			border: 1px solid lightsteelblue;
+			height: 30px;
+			line-height:15px;
+			margin: 2px 6px 16px 0px;
+			padding: 5px 10px 5px 10px;
+			
+		}
+		input[type="submit"] {
+			padding: 5px 10px 5px 10px;
+			color: black;
+			background: solid lightsteelblue;
+			border: none;
+			box-shadow: 1px 1px 1px #4C6E91;
+		}
+		input[type="submit"]:hover{
+			background: steelblue;
 		}
 	</style>
 </head>
 <body>
-	<h1>Headlines</h1>
-	
+	<div id="header">
+		<h1>Headlines</h1>
+		<p>Weather. Currency. News Feeds</p>
+	</div>
 	<hr>
 	<h3>Weather Details</h3>	
 	<h4>Current Weather</h4>
 	<form method="GET">
 		<input type="text" name="city" placeholder="City" />
-		<input type="submit" value="Sumbit"/>
+		<input type="submit" value="Submit"/>
 	</form>
 
 	<p>City: <b>{{weather.city}}, {{weather.country}}</b></p>
@@ -68,7 +107,7 @@
 			<option value="{{c}}" {{'selected="selected"' if channel==c }}> {{c}} </option>
 		{% endfor %}
 		</select>
-		<input type="submit" value="Sumbit"/>
+		<input type="submit" value="Submit"/>
 	</form>
 	{% for article in articles %}
 		<b><a href="{{article.link}}">{{article.title}}</a></b><br>
